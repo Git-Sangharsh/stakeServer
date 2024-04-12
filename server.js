@@ -39,6 +39,9 @@ const registerSchema = mongoose.Schema ({
   }
 })
 
+// Registration Model
+const registerModel = mongoose.model("register", registerSchema);
+
 
 // Registration Endpoint
 app.post("/register", (req, res) => {
