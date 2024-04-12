@@ -63,7 +63,7 @@ app.post("/register", async (req, res) => {
         registerUsername: sendRegisterUsername,
         registerPassword: sendRegisterPassword,
       });
-      res.status(200).json({ register: "success", info: addRegister });
+      res.status(200).json({ registerStatus: true , info: addRegister });
     }
   } catch (err) {
     console.error(err);
