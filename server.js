@@ -24,6 +24,28 @@ mongoose
 app.use(cors());
 app.use(bodyParser.json());
 
+// Registration Schema
+const registerSchema = mongoose.Schema ({
+  registerEmail: {
+    type: String,
+    unique: true
+  },
+  registerUsername: {
+    type: String,
+    unique: true
+  },
+  registerPassword: {
+    type: String
+  }
+})
+
+
+// Registration Endpoint
+app.post("/register", (req, res) => {
+  res.send('<h1>Welcome!</h1>');
+});
+
+
 // Routes
 app.get('/', (req, res) => {
     res.send('<h1>Welcome!</h1>');
