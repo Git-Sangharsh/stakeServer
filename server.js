@@ -25,7 +25,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Registration Schema
-const registerSchema = mongoose.Schema ({
+const registerSchema = new mongoose.Schema ({
   registerEmail: {
     type: String,
     unique: true
@@ -41,7 +41,6 @@ const registerSchema = mongoose.Schema ({
 
 // Registration Model
 const registerModel = mongoose.model("register", registerSchema);
-
 
 // Registration Endpoint
 app.post("/register", (req, res) => {
