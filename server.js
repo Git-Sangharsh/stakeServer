@@ -28,11 +28,11 @@ app.use(bodyParser.json());
 const registerSchema = new mongoose.Schema({
   registerEmail: {
     type: String,
-    unique: true,
+    // unique: true,
   },
   registerUsername: {
     type: String,
-    unique: true,
+    // unique: true,
   },
   registerPassword: {
     type: String,
