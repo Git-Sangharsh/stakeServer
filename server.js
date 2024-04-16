@@ -85,15 +85,15 @@ app.post("/register", async (req, res) => {
 });
 
 app.post("/verifyemail", async (req, res) => {
-  const { sendVerifyEmail, } = req.body;
+  const { sendVerifyEmail, sendVerificationCode} = req.body.registerData;
   try {
     // Send verification email using Nodemailer
     const mailOptions = {
-      from: `Fake Stake ${env_Nodemailer_Auth}`,
+      from: `Stake ${env_Nodemailer_Auth}`,
       to: sendVerifyEmail,
-      subject: "Email Verification",
+      subject: "Email Verification Stake",
       text: "Your email has been successfully verified.",
-      html: "<h1>HEllo World </h1>"
+      html: `<h1>Your verification code is: ${sendVerificationCode}</h1>`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -101,7 +101,7 @@ app.post("/verifyemail", async (req, res) => {
         console.error("Error sending email:", error);
         res.status(500).json({ error: "Error sending verification email" });
       } else {
-        console.log("Verification Email sent successfully:", info.response);
+        // console.log("Verification Email sent successfully:", info.response);
         res.status(200).json({ success: true, message: "Verification email sent successfully" });
       }
     });
