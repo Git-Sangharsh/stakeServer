@@ -4,6 +4,8 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import { config as dotenvConfig } from "dotenv";
 import nodemailer from "nodemailer";
+import bcrypt from "bcryptjs";
+
 
 // Load environment variables from .env file
 dotenvConfig();
@@ -12,7 +14,7 @@ const envPassWord = process.env.MONGODB_PASSWORD;
 const env_Nodemailer_Auth = process.env.NODEMAILER_AUTH;
 const env_Nodemailer_PassWord = process.env.NODEMAILER_PASSWORD;
 const app = express();
-const port = process.env.PORT || 5000;
+const port =  5000;
 
 mongoose
   .connect(
@@ -76,7 +78,7 @@ app.post("/register", async (req, res) => {
         registerUsername: sendRegisterUsername,
         registerPassword: sendRegisterPassword,
       });
-      res.status(200).json({ registerStatus: true, info: addRegister });
+      res.status(200).json({ registerStatus: "success", info: addRegister });
     }
   } catch (err) {
     console.error(err);
@@ -101,7 +103,7 @@ app.post("/verifyemail", async (req, res) => {
         console.error("Error sending email:", error);
         res.status(500).json({ error: "Error sending verification email" });
       } else {
-        // console.log("Verification Email sent successfully:", info.response);
+        console.log("Verification Email sent successfully:", info.response);
         res.status(200).json({ success: true, message: "Verification email sent successfully" });
       }
     });
@@ -111,6 +113,28 @@ app.post("/verifyemail", async (req, res) => {
   }
 });
 
+app.post('/signin', async (req, res) => {
+  const { sendSignEmail, sendSignPass } = req.body;
+
+  try {
+      const user = await registerModel.findOne({ registerEmail: sendSignEmail });
+
+      if (!user) {
+          return res.status(400).json({ message: 'User not found' });
+      }
+
+      const passwordMatch = await bcrypt.compare(sendSignPass, user.registerPassword);
+
+      if (!passwordMatch) {
+          return res.status(400).json({ message: 'Incorrect password' });
+      }
+
+      res.status(200).json({ message: 'Signin successful', user: user.registerUsername, pass: user.registerPassword   });
+  } catch (error) {
+      console.error('Error during signin:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 // Start server
 app.listen(port, () => {
