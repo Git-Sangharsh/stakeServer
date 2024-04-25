@@ -6,7 +6,6 @@ import { config as dotenvConfig } from "dotenv";
 import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
 
-
 // Load environment variables from .env file
 dotenvConfig();
 const envUserName = process.env.MONGODB_USERNAME;
@@ -14,7 +13,7 @@ const envPassWord = process.env.MONGODB_PASSWORD;
 const env_Nodemailer_Auth = process.env.NODEMAILER_AUTH;
 const env_Nodemailer_PassWord = process.env.NODEMAILER_PASSWORD;
 const app = express();
-const port =  5000;
+const port = 5000;
 
 mongoose
   .connect(
@@ -31,12 +30,12 @@ app.use(bodyParser.json());
 
 // Nodemailer transporter configuration
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  host: 'smtp.ethereal.email',
+  service: "gmail",
+  host: "smtp.ethereal.email",
   auth: {
-      user: env_Nodemailer_Auth,
-      pass: env_Nodemailer_PassWord
-    }
+    user: env_Nodemailer_Auth,
+    pass: env_Nodemailer_PassWord,
+  },
 });
 
 // Registration Schema
@@ -87,7 +86,7 @@ app.post("/register", async (req, res) => {
 });
 
 app.post("/verifyemail", async (req, res) => {
-  const { sendVerifyEmail, sendVerificationCode} = req.body.registerData;
+  const { sendVerifyEmail, sendVerificationCode } = req.body.registerData;
   try {
     // Send verification email using Nodemailer
     const mailOptions = {
@@ -95,7 +94,7 @@ app.post("/verifyemail", async (req, res) => {
       to: sendVerifyEmail,
       subject: "Email Verification Stake",
       text: "Your email has been successfully verified.",
-      html: `<h1>Your verification code is: ${sendVerificationCode}</h1>`
+      html: `<h1>Your verification code is: ${sendVerificationCode}</h1>`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -104,7 +103,12 @@ app.post("/verifyemail", async (req, res) => {
         res.status(500).json({ error: "Error sending verification email" });
       } else {
         console.log("Verification Email sent successfully:", info.response);
-        res.status(200).json({ success: true, message: "Verification email sent successfully" });
+        res
+          .status(200)
+          .json({
+            success: true,
+            message: "Verification email sent successfully",
+          });
       }
     });
   } catch (err) {
@@ -113,26 +117,35 @@ app.post("/verifyemail", async (req, res) => {
   }
 });
 
-app.post('/signin', async (req, res) => {
+app.post("/signin", async (req, res) => {
   const { sendSignEmail, sendSignPass } = req.body;
 
   try {
-      const user = await registerModel.findOne({ registerEmail: sendSignEmail });
+    const user = await registerModel.findOne({ registerEmail: sendSignEmail });
 
-      if (!user) {
-          return res.status(400).json({ message: 'User not found' });
-      }
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
 
-      const passwordMatch = await bcrypt.compare(sendSignPass, user.registerPassword);
+    const passwordMatch = await bcrypt.compare(
+      sendSignPass,
+      user.registerPassword
+    );
 
-      if (!passwordMatch) {
-          return res.status(400).json({ message: 'Incorrect password' });
-      }
+    if (!passwordMatch) {
+      return res.status(400).json({ message: "Incorrect password" });
+    }
 
-      res.status(200).json({ message: 'Signin successful', user: user.registerUsername, pass: user.registerPassword   });
+    res
+      .status(200)
+      .json({
+        message: "Signin successful",
+        user: user.registerUsername,
+        status: true
+      });
   } catch (error) {
-      console.error('Error during signin:', error);
-      res.status(500).json({ message: 'Internal server error' });
+    console.error("Error during signin:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
