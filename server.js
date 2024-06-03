@@ -51,6 +51,9 @@ const registerSchema = new mongoose.Schema({
   registerPassword: {
     type: String,
   },
+  betCounter: {
+    type: Number,
+  }
 });
 
 // Registration Model
@@ -103,12 +106,10 @@ app.post("/verifyemail", async (req, res) => {
         res.status(500).json({ error: "Error sending verification email" });
       } else {
         console.log("Verification Email sent successfully:", info.response);
-        res
-          .status(200)
-          .json({
-            success: true,
-            message: "Verification email sent successfully",
-          });
+        res.status(200).json({
+          success: true,
+          message: "Verification email sent successfully",
+        });
       }
     });
   } catch (err) {
@@ -119,10 +120,8 @@ app.post("/verifyemail", async (req, res) => {
 
 app.post("/signin", async (req, res) => {
   const { sendSignEmail, sendSignPass } = req.body;
-
   try {
     const user = await registerModel.findOne({ registerEmail: sendSignEmail });
-
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
@@ -136,19 +135,33 @@ app.post("/signin", async (req, res) => {
       return res.status(400).json({ message: "Incorrect password" });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Signin successful",
-        user: user.registerUsername,
-        status: true
-      });
+    res.status(200).json({
+      message: "Signin successful",
+      user: user.registerUsername,
+      status: true,
+    });
   } catch (error) {
     console.error("Error during signin:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
+app.post("/betcounter", async (req, res) => {
+  const {userEmail, betCounter} = req.body;
+  try{
+    const user = await registerModel.findOne({ registerEmail: userEmail });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    } else{
+      user.betCounter = betCounter;
+      await user.save();
+      return res.status(200).json({message: "Bet Counter Updated Succesfully", betCounter: user.betCounter})
+    }
+  }catch (error) {
+    console.error("Error during Statistics betCounter backend:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+})
 // Start server
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
