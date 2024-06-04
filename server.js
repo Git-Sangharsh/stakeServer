@@ -53,6 +53,12 @@ const registerSchema = new mongoose.Schema({
   },
   betCounter: {
     type: Number,
+  },
+  betCounterWin: {
+    type: Number,
+  },
+  betCounterLoss: {
+    type: Number,
   }
 });
 
@@ -147,21 +153,28 @@ app.post("/signin", async (req, res) => {
 });
 
 app.post("/betcounter", async (req, res) => {
-  const {userEmail, betCounter} = req.body;
-  try{
+  const { userEmail, betCounter, betCounterWin, betCounterLoss } = req.body;
+  try {
     const user = await registerModel.findOne({ registerEmail: userEmail });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
-    } else{
+    } else {
       user.betCounter = betCounter;
+      user.betCounterWin = betCounterWin;
+      user.betCounterLoss = betCounterLoss;
       await user.save();
-      return res.status(200).json({message: "Bet Counter Updated Succesfully", betCounter: user.betCounter})
+      return res
+        .status(200)
+        .json({
+          message: "Bet Counter Updated Succesfully",
+          betCounter: user.betCounter,
+        });
     }
-  }catch (error) {
+  } catch (error) {
     console.error("Error during Statistics betCounter backend:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-})
+});
 // Start server
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
