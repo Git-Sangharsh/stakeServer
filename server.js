@@ -59,7 +59,7 @@ const registerSchema = new mongoose.Schema({
   },
   betCounterLoss: {
     type: Number,
-  }
+  },
 });
 
 // Registration Model
@@ -163,12 +163,9 @@ app.post("/betcounter", async (req, res) => {
       user.betCounterWin = betCounterWin;
       user.betCounterLoss = betCounterLoss;
       await user.save();
-      return res
-        .status(200)
-        .json({
-          message: "Bet Counter Updated Succesfully",
-          betCounter: user.betCounter,
-        });
+      return res.status(200).json({
+        message: "Bet Counter Updated Succesfully",
+      });
     }
   } catch (error) {
     console.error("Error during Statistics betCounter backend:", error);
