@@ -155,7 +155,7 @@ app.post("/signin", async (req, res) => {
   }
 });
 
-app.post("/checkbetcounter", async (req, res) => {
+app.post("/betcounter", async (req, res) => {
   const { userEmail, betCounter, betCounterWin, betCounterLoss, betCounterWagered } = req.body;
   try {
     const user = await registerModel.findOne({ registerEmail: userEmail });
