@@ -24,8 +24,8 @@ mongoose
     console.log("mongodb error: ", error);
   });
 
-// Middleware
 app.use(cors());
+// Middleware
 app.use(bodyParser.json());
 
 // Nodemailer transporter configuration
@@ -60,6 +60,9 @@ const registerSchema = new mongoose.Schema({
   betCounterLoss: {
     type: Number,
   },
+  betCounterWagered: {
+    type: Number
+  }
 });
 
 // Registration Model
@@ -153,7 +156,7 @@ app.post("/signin", async (req, res) => {
 });
 
 app.post("/betcounter", async (req, res) => {
-  const { userEmail, betCounter, betCounterWin, betCounterLoss } = req.body;
+  const { userEmail, betCounter, betCounterWin, betCounterLoss, betCounterWagered } = req.body;
   try {
     const user = await registerModel.findOne({ registerEmail: userEmail });
     if (!user) {
@@ -162,9 +165,10 @@ app.post("/betcounter", async (req, res) => {
       user.betCounter = betCounter;
       user.betCounterWin = betCounterWin;
       user.betCounterLoss = betCounterLoss;
+      user.betCounterWagered = betCounterWagered;
       await user.save();
       return res.status(200).json({
-        message: "Bet Counter Updated Succesfully",
+        message: "Statistics Update Successfully!!",
       });
     }
   } catch (error) {
