@@ -24,17 +24,8 @@ mongoose
     console.log("mongodb error: ", error);
   });
 
-  const allowedOrigins = ['http://localhost:3000', 'https://mines-x3cj.onrender.com'];
-
-  app.use(cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    }
-  }));// Middleware
+app.use(cors());
+// Middleware
 app.use(bodyParser.json());
 
 // Nodemailer transporter configuration
@@ -107,11 +98,18 @@ app.post("/register", async (req, res) => {
 });
 
 app.post("/verifyemail", async (req, res) => {
-  const { sendVerifyEmail, sendVerificationCode } = req.body.registerData;
+  console.log("Received request body:", req.body);  // Log the incoming request body
+
+  const { sendVerifyEmail, sendVerificationCode } = req.body;
+
+  if (!sendVerifyEmail || !sendVerificationCode) {
+    return res.status(400).json({ error: "sendVerifyEmail or sendVerificationCode is missing from the request body" });
+  }
+
   try {
     // Send verification email using Nodemailer
     const mailOptions = {
-      from: `Stake ${env_Nodemailer_Auth}`,
+      from: `Stake ${process.env.EMAIL_USER}`,
       to: sendVerifyEmail,
       subject: "Email Verification Stake",
       text: "Your email has been successfully verified.",
@@ -135,6 +133,7 @@ app.post("/verifyemail", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error from verifyemail" });
   }
 });
+
 
 app.post("/signin", async (req, res) => {
   const { sendSignEmail, sendSignPass } = req.body;
