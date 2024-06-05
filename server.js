@@ -24,8 +24,17 @@ mongoose
     console.log("mongodb error: ", error);
   });
 
-app.use(cors());
-// Middleware
+  const allowedOrigins = ['http://localhost:3000', 'https://mines-x3cj.onrender.com'];
+
+  app.use(cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    }
+  }));// Middleware
 app.use(bodyParser.json());
 
 // Nodemailer transporter configuration
