@@ -24,7 +24,7 @@ mongoose
     console.log("mongodb error: ", error);
   });
 
-app.use(cors());
+// app.use(cors());
 // Middleware
 app.use(bodyParser.json());
 
