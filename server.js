@@ -51,6 +51,10 @@ const registerSchema = new mongoose.Schema({
   registerPassword: {
     type: String,
   },
+  walletBalance: {
+    type: Number,
+    default: 0
+  },
   betCounter: {
     type: Number,
     default: 0,
@@ -208,8 +212,8 @@ app.get("/betcounter", async (req, res) => {
     if(!user){
       return res.status(404).json({ message: "User Not Found!" });
     }
-    const { betCounter, betCounterWin, betCounterLoss,betCounterWagered} = user;
-    res.status(200).json({betCounter, betCounterWin, betCounterLoss, betCounterWagered})
+    const {walletBalance, betCounter, betCounterWin, betCounterLoss,betCounterWagered} = user;
+    res.status(200).json({betCounter, betCounterWin, betCounterLoss, betCounterWagered, walletBalance})
   } catch (error) {
     console.error("Error during GET Statistics betCounter backend:", error);
     res.status(500).json({ message: "Internal server error" });
