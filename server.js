@@ -53,16 +53,20 @@ const registerSchema = new mongoose.Schema({
   },
   betCounter: {
     type: Number,
+    default: 0,
   },
   betCounterWin: {
     type: Number,
+    default: 0,
   },
   betCounterLoss: {
     type: Number,
+    default: 0,
   },
   betCounterWagered: {
-    type: Number
-  }
+    type: Number,
+    default: 0,
+  },
 });
 
 // Registration Model
@@ -98,12 +102,15 @@ app.post("/register", async (req, res) => {
 });
 
 app.post("/verifyemail", async (req, res) => {
-  console.log("Received request body:", req.body);  // Log the incoming request body
+  console.log("Received request body:", req.body); // Log the incoming request body
 
   const { sendVerifyEmail, sendVerificationCode } = req.body;
 
   if (!sendVerifyEmail || !sendVerificationCode) {
-    return res.status(400).json({ error: "sendVerifyEmail or sendVerificationCode is missing from the request body" });
+    return res.status(400).json({
+      error:
+        "sendVerifyEmail or sendVerificationCode is missing from the request body",
+    });
   }
 
   try {
@@ -134,7 +141,6 @@ app.post("/verifyemail", async (req, res) => {
   }
 });
 
-
 app.post("/signin", async (req, res) => {
   const { sendSignEmail, sendSignPass } = req.body;
   try {
@@ -164,7 +170,13 @@ app.post("/signin", async (req, res) => {
 });
 
 app.post("/betcounter", async (req, res) => {
-  const { userEmail, betCounter, betCounterWin, betCounterLoss, betCounterWagered } = req.body;
+  const {
+    userEmail,
+    betCounter,
+    betCounterWin,
+    betCounterLoss,
+    betCounterWagered,
+  } = req.body;
   try {
     const user = await registerModel.findOne({ registerEmail: userEmail });
     if (!user) {
@@ -181,6 +193,25 @@ app.post("/betcounter", async (req, res) => {
     }
   } catch (error) {
     console.error("Error during Statistics betCounter backend:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+//Get betCounter Endpoint
+app.get("/betcounter", async (req, res) => {
+  const { userEmail } = req.query;
+  if (!userEmail) {
+    return res.status(404).json({ message: "User Email Is Required!!" });
+  }
+  try {
+    const user = await registerModel.findOne({registerEmail: userEmail});
+    if(!user){
+      return res.status(404).json({ message: "User Not Found!" });
+    }
+    const { betCounter, betCounterWin, betCounterLoss,betCounterWagered} = user;
+    res.status(200).json({betCounter, betCounterWin, betCounterLoss, betCounterWagered})
+  } catch (error) {
+    console.error("Error during GET Statistics betCounter backend:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
