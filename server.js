@@ -180,6 +180,7 @@ app.post("/betcounter", async (req, res) => {
     betCounterWin,
     betCounterLoss,
     betCounterWagered,
+    walletBalance
   } = req.body;
   try {
     const user = await registerModel.findOne({ registerEmail: userEmail });
@@ -190,9 +191,11 @@ app.post("/betcounter", async (req, res) => {
       user.betCounterWin = betCounterWin;
       user.betCounterLoss = betCounterLoss;
       user.betCounterWagered = betCounterWagered;
+      user.walletBalance = walletBalance;
       await user.save();
       return res.status(200).json({
         message: "Statistics Update Successfully!!",
+        walletBalance: user.walletBalance
       });
     }
   } catch (error) {
