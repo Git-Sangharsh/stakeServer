@@ -194,7 +194,8 @@ app.post("/betcounter", async (req, res) => {
       user.walletBalance = walletBalance;
       await user.save();
       return res.status(200).json({
-        message: "Statistics Update Successfully!!"
+        message: "Statistics Update Successfully!!",
+        walletBalance: user.walletBalance
       });
     }
   } catch (error) {
