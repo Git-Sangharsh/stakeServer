@@ -53,7 +53,7 @@ const registerSchema = new mongoose.Schema({
   },
   walletBalance: {
     type: Number,
-    default: 0
+    default: 0,
   },
   betCounter: {
     type: Number,
@@ -85,12 +85,19 @@ app.get("/", (req, res) => {
 app.post("/register", async (req, res) => {
   const { sendRegisterEmail, sendRegisterUsername, sendRegisterPassword } =
     req.body;
+  const userEmailIsTrue = await registerModel.findOne({
+    registerEmail: sendRegisterEmail,
+  });
+  const uniqueUserName = await registerModel.findOne({
+    registerUsername: sendRegisterUsername,
+  });
   try {
-    const userEmailIsTrue = await registerModel.findOne({
-      registerEmail: sendRegisterEmail,
-    });
     if (userEmailIsTrue) {
-      res.status(200).json({ userExist: "exit" });
+      res
+        .status(409)
+        .json({ userExist: "Email is already in use, try Sign in" });
+    } else if (uniqueUserName) {
+      res.status(409).json({ userExist: "UserName is already in use." });
     } else {
       const addRegister = await registerModel.create({
         registerEmail: sendRegisterEmail,
@@ -150,7 +157,7 @@ app.post("/signin", async (req, res) => {
   try {
     const user = await registerModel.findOne({ registerEmail: sendSignEmail });
     if (!user) {
-      return res.status(400).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     const passwordMatch = await bcrypt.compare(
@@ -159,7 +166,7 @@ app.post("/signin", async (req, res) => {
     );
 
     if (!passwordMatch) {
-      return res.status(400).json({ message: "Incorrect password" });
+      return res.status(401).json({ message: "Incorrect password" });
     }
 
     res.status(200).json({
@@ -180,7 +187,7 @@ app.post("/betcounter", async (req, res) => {
     betCounterWin,
     betCounterLoss,
     betCounterWagered,
-    walletBalance
+    walletBalance,
   } = req.body;
   try {
     const user = await registerModel.findOne({ registerEmail: userEmail });
@@ -195,7 +202,7 @@ app.post("/betcounter", async (req, res) => {
       await user.save();
       return res.status(200).json({
         message: "Statistics Update Successfully!!",
-        walletBalance: user.walletBalance
+        walletBalance: user.walletBalance,
       });
     }
   } catch (error) {
@@ -211,12 +218,24 @@ app.get("/betcounter", async (req, res) => {
     return res.status(404).json({ message: "User Email Is Required!!" });
   }
   try {
-    const user = await registerModel.findOne({registerEmail: userEmail});
-    if(!user){
+    const user = await registerModel.findOne({ registerEmail: userEmail });
+    if (!user) {
       return res.status(404).json({ message: "User Not Found!" });
     }
-    const {walletBalance, betCounter, betCounterWin, betCounterLoss,betCounterWagered} = user;
-    res.status(200).json({betCounter, betCounterWin, betCounterLoss, betCounterWagered, walletBalance})
+    const {
+      walletBalance,
+      betCounter,
+      betCounterWin,
+      betCounterLoss,
+      betCounterWagered,
+    } = user;
+    res.status(200).json({
+      betCounter,
+      betCounterWin,
+      betCounterLoss,
+      betCounterWagered,
+      walletBalance,
+    });
   } catch (error) {
     console.error("Error during GET Statistics betCounter backend:", error);
     res.status(500).json({ message: "Internal server error" });
