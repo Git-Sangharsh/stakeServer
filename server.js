@@ -117,6 +117,12 @@ app.post("/verifyemail", async (req, res) => {
 
   const { sendVerifyEmail, sendVerificationCode } = req.body;
 
+  const userEmailExist = await registerModel.findOne({ registerEmail: sendVerifyEmail});
+
+  if(userEmailExist ){
+    res.status(409).json({message: "Email already in use!"})
+  }
+
   if (!sendVerifyEmail || !sendVerificationCode) {
     return res.status(400).json({
       error:
