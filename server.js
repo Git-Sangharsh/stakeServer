@@ -128,7 +128,7 @@ app.post("/verifyemail", async (req, res) => {
     const userEmailExist = await registerModel.findOne({ registerEmail: sendVerifyEmail });
 
     if (userEmailExist) {
-      return res.status(409).json({ message: "Email already in use!", userEmailExist: "exist" });
+      return res.status(200).json({ message: "Email already in use!", userEmailExist: "exist" });
     }
 
     // Send verification email using Nodemailer
