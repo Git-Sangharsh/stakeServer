@@ -117,12 +117,6 @@ app.post("/verifyemail", async (req, res) => {
 
   const { sendVerifyEmail, sendVerificationCode } = req.body;
 
-  const userEmailExist = await registerModel.findOne({ registerEmail: sendVerifyEmail});
-
-  if(userEmailExist ){
-    res.status(409).json({message: "Email already in use!"})
-  }
-
   if (!sendVerifyEmail || !sendVerificationCode) {
     return res.status(400).json({
       error:
@@ -131,6 +125,12 @@ app.post("/verifyemail", async (req, res) => {
   }
 
   try {
+    const userEmailExist = await registerModel.findOne({ registerEmail: sendVerifyEmail });
+
+    if (userEmailExist) {
+      return res.status(409).json({ message: "Email already in use!", userEmailExist: "exist" });
+    }
+
     // Send verification email using Nodemailer
     const mailOptions = {
       from: `Stake ${process.env.EMAIL_USER}`,
@@ -143,10 +143,10 @@ app.post("/verifyemail", async (req, res) => {
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error("Error sending email:", error);
-        res.status(500).json({ error: "Error sending verification email" });
+        return res.status(500).json({ error: "Error sending verification email" });
       } else {
         console.log("Verification Email sent successfully:", info.response);
-        res.status(200).json({
+        return res.status(200).json({
           success: true,
           message: "Verification email sent successfully",
         });
@@ -154,9 +154,10 @@ app.post("/verifyemail", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Internal Server Error from verifyemail" });
+    return res.status(500).json({ error: "Internal Server Error from verifyemail" });
   }
 });
+
 
 app.post("/signin", async (req, res) => {
   const { sendSignEmail, sendSignPass } = req.body;
