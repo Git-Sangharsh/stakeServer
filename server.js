@@ -125,10 +125,14 @@ app.post("/verifyemail", async (req, res) => {
   }
 
   try {
-    const userEmailExist = await registerModel.findOne({ registerEmail: sendVerifyEmail });
+    const userEmailExist = await registerModel.findOne({
+      registerEmail: sendVerifyEmail,
+    });
 
     if (userEmailExist) {
-      return res.status(200).json({ message: "Email already in use!", userEmailExist: "exist" });
+      return res
+        .status(200)
+        .json({ message: "Email already in use!", userEmailExist: "exist" });
     }
 
     // Send verification email using Nodemailer
@@ -143,7 +147,9 @@ app.post("/verifyemail", async (req, res) => {
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error("Error sending email:", error);
-        return res.status(500).json({ error: "Error sending verification email" });
+        return res
+          .status(500)
+          .json({ error: "Error sending verification email" });
       } else {
         console.log("Verification Email sent successfully:", info.response);
         return res.status(200).json({
@@ -154,10 +160,11 @@ app.post("/verifyemail", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: "Internal Server Error from verifyemail" });
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error from verifyemail" });
   }
 });
-
 
 app.post("/signin", async (req, res) => {
   const { sendSignEmail, sendSignPass } = req.body;
@@ -173,7 +180,7 @@ app.post("/signin", async (req, res) => {
     );
 
     if (!passwordMatch) {
-      return res.status(401).json({ message: "Incorrect password" });
+      return res.status(200).json({ password: false });
     }
 
     res.status(200).json({
