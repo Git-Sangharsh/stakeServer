@@ -93,18 +93,16 @@ app.post("/register", async (req, res) => {
   });
   try {
     if (userEmailIsTrue) {
-      res
-        .status(409)
-        .json({ userExist: "Email is already in use, try Sign in" });
+      res.status(200).json({ userExist: true });
     } else if (uniqueUserName) {
-      res.status(409).json({ userExist: "UserName is already in use." });
+      res.status(200).json({ userUnique: true });
     } else {
       const addRegister = await registerModel.create({
         registerEmail: sendRegisterEmail,
         registerUsername: sendRegisterUsername,
         registerPassword: sendRegisterPassword,
       });
-      res.status(200).json({ registerStatus: "success", info: addRegister });
+      res.status(200).json({ registerStatus: "success" });
     }
   } catch (err) {
     console.error(err);
