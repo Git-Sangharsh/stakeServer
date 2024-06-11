@@ -43,13 +43,16 @@ const registerSchema = new mongoose.Schema({
   registerEmail: {
     type: String,
     // unique: true,
+    required: true
   },
   registerUsername: {
     type: String,
+    required: true
     // unique: true,
   },
   registerPassword: {
     type: String,
+    required: true
   },
   walletBalance: {
     type: Number,
@@ -116,9 +119,10 @@ app.post("/verifyemail", async (req, res) => {
   const { sendVerifyEmail, sendVerificationCode } = req.body;
 
   if (!sendVerifyEmail || !sendVerificationCode) {
-    return res.status(400).json({
+    return res.status(200).json({
       error:
         "sendVerifyEmail or sendVerificationCode is missing from the request body",
+        sendVerificationCode: false
     });
   }
 
